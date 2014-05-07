@@ -28,21 +28,24 @@ def download_articles(url_file, cookie_file, article_dir, overwrite):
 
   downloaded, failed, skipped = 0, 0, 0
   for i in range(len(urls)):
+    output_dir = '%s/%04d' % (article_dir, i/1000)
+    if not os.path.isdir(output_dir):
+      os.mkdir(output_dir)
     assert urls[i].startswith(URL_PREFIX)
     p = urls[i].find('-')
     assert p > len(URL_PREFIX)
     article_id = int(urls[i][len(URL_PREFIX):p])
-    article_path = '%s/%d.html' % (article_dir, article_id)
+    output_path = '%s/%d.html' % (output_dir, article_id)
 
-    if os.path.isfile(article_path):
+    if os.path.isfile(output_path):
       if not overwrite:
         skipped += 1
         continue
-      os.remove(article_path)
+      os.remove(output_path)
 
     url = '%s%s' % (HOST, urls[i])
-    print '%d/%d: %s => %s' % (i+1, len(urls), url, article_path)
-    ok = download_article(url, cookie_file, article_path)
+    print '%d/%d: %s => %s' % (i+1, len(urls), url, output_path)
+    ok = download_article(url, cookie_file, output_path)
     if ok:
       downloaded += 1
     else:
